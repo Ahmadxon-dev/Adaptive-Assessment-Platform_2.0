@@ -3,6 +3,7 @@
 ## MERN Stack App
 
 An intelligent assessment system designed to create, manage, and deliver adaptive tests.
+
 The platform supports multiple user roles with controlled access, allowing educators to create tests with or without options across different difficulty levels. It also enables automated generation of multiple test variations from selected topics, ensuring academic integrity. Students can take assessments and receive certificates based on their performance.
 
 ---
@@ -49,10 +50,10 @@ The platform supports multiple user roles with controlled access, allowing educa
   - Support for **3 difficulty levels** per test  
 
 - 📚 **Topic & Curriculum Structure**
-  - Supports:
+  - Supports tests for:
     - Grades 7–11  
-    - Attestation  
-    - Undergraduate levels  
+    - Attestation(like final exams after 9th and 11th grade)
+    - Undergraduate levels
   - Organized topics with integrated question banks  
 
 - 🔄 **Automated Test Generation**
