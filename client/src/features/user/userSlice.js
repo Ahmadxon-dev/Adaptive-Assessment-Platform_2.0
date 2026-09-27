@@ -27,7 +27,11 @@ const userSlice = createSlice({
             state._id = null
             localStorage.clear()
             localStorage.removeItem("token")
+        },
+        changeUserElement: (state, action) =>{
+            state[action.payload.key] = action.payload.value
         }
+
     },
 });
 

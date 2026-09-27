@@ -21,7 +21,7 @@ function QuestionTypePage(props) {
                         questionTypes.map(el=>{
                             return <Button asChild key={el} className={`px-8 py-3 pb-4 text-2xl`}>
                                 <Link to={el}>
-                                    {el==="multiple-choice"?"Ochiq Test":"Yopiq Test"}
+                                    {el==="multiple-choice"?"Yopiq Test":"Ochiq Test"}
                                 </Link>
                             </Button>
                         })

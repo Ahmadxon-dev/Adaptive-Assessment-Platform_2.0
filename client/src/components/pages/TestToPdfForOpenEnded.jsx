@@ -10,13 +10,11 @@ import {Input} from "@/components/ui/input.jsx";
 import Loader from "@/components/ui/Loader.jsx";
 import {useToast} from "@/hooks/use-toast.js";
 import {v4 as uuidv4} from "uuid";
-import CryptoJS from "crypto-js";
-import {generateOpenEndedCombinedWord} from "@/hooks/test-word-generation.js";
 
-const secretKey = `${import.meta.env.VITE_SECRET_KEY}`;
-const encryptData = (data) => {
-    return CryptoJS.AES.encrypt(data, secretKey).toString();
-};
+// const secretKey = `${import.meta.env.VITE_SECRET_KEY}`;
+// const encryptData = (data) => {
+//     return CryptoJS.AES.encrypt(data, secretKey).toString();
+// };
 function TestToPdfForOpenEnded({openEndedData, database, setPdfUrls, setAnswersUrl, setCombinedUrl}) {
     const [selectedSubtopics, setSelectedSubtopics] = useState([]);
     const [btnLoader, setBtnLoader] = useState(false)
@@ -70,9 +68,9 @@ function TestToPdfForOpenEnded({openEndedData, database, setPdfUrls, setAnswersU
                 .slice(0, numQuestions)
             testVariations.push(shuffledQuestions);
         }
-        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid)
-        generateOpenEndedAnswers(testVariations, setAnswersUrl, encryptData, uuid)
-        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid)
+        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid)
+        generateOpenEndedAnswers(testVariations, setAnswersUrl,  uuid)
+        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl,  uuid)
         setBtnLoader(false);
     }
 
@@ -152,9 +150,9 @@ function TestToPdfForOpenEnded({openEndedData, database, setPdfUrls, setAnswersU
             });
         });
 
-        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid);
-        generateOpenEndedAnswers(testVariations, setAnswersUrl, encryptData, uuid);
-        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid);
+        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid);
+        generateOpenEndedAnswers(testVariations, setAnswersUrl,  uuid);
+        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl,  uuid);
         setBtnLoader(false);
     }
 
@@ -238,9 +236,9 @@ function TestToPdfForOpenEnded({openEndedData, database, setPdfUrls, setAnswersU
             });
         });
 
-        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid);
-        generateOpenEndedAnswers(testVariations, setAnswersUrl, encryptData, uuid);
-        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid);
+        generateOpenEndedWord(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid);
+        generateOpenEndedAnswers(testVariations, setAnswersUrl,  uuid);
+        generateOpenEndedCombinedWord(testVariations, zagolovokText, setCombinedUrl,  uuid);
         setBtnLoader(false);
     }
     return (

@@ -1,57 +1,53 @@
-import React, {useEffect, useState} from 'react';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {Button} from "@/components/ui/button.jsx";
-import {Link, useNavigate} from "react-router-dom";
-import {Label} from "@/components/ui/label.jsx";
-import {Input} from "@/components/ui/input.jsx";
-import {Loader2, Minus, Plus} from "lucide-react";
-import {useDispatch, useSelector} from "react-redux";
-import {setTest} from "@/features/test/testSlice.js";
-import {Checkbox} from "@/components/ui/checkbox.jsx";
-import {Card} from "@/components/ui/card.jsx";
-import {useToast} from "@/hooks/use-toast.js";
-import {useQuery} from "@tanstack/react-query";
-import Loader from "@/components/ui/Loader.jsx";
+import React, { useEffect, useState } from "react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button.jsx"
+import { Link, useNavigate } from "react-router-dom"
+import { Label } from "@/components/ui/label.jsx"
+import { Input } from "@/components/ui/input.jsx"
+import { Loader2, Minus, Plus } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
+import { setTest } from "@/features/test/testSlice.js"
+import { Checkbox } from "@/components/ui/checkbox.jsx"
+import { Card } from "@/components/ui/card.jsx"
+import { useToast } from "@/hooks/use-toast.js"
+import { useQuery } from "@tanstack/react-query"
+import Loader from "@/components/ui/Loader.jsx"
 
 const fetchData = async (id) => {
-    const response = await fetch(
-        `${import.meta.env.VITE_SERVER}/test/getfulltestdb-by-id/${id}`
-    )
+    const response = await fetch(`${import.meta.env.VITE_SERVER}/test/getfulltestdb-by-id/${id}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    })
     return response.json()
 }
 function AbituriyentPage(props) {
-    const [selectedMaintopic, setSelectedMaintopic] = useState('');
-    const [selectedSubtopics, setSelectedSubtopics] = useState([]);
+    const [selectedMaintopic, setSelectedMaintopic] = useState("")
+    const [selectedSubtopics, setSelectedSubtopics] = useState([])
     const [loadingforBtn, setLoadingforBtn] = useState(false)
     const [topicsData, setTopicsData] = useState([])
     const [numQuestions, setNumQuestions] = useState(0)
-    const {toast} = useToast()
+    const { toast } = useToast()
     const dispatch = useDispatch()
-    const user = useSelector(state => state.user);
+    const user = useSelector((state) => state.user)
     const navigate = useNavigate()
-    const selectedTopicData = topicsData.find(topic => topic.maintopicname === selectedMaintopic);
-    const subtopics = selectedTopicData ? selectedTopicData.subtopics : [];
-    const [time, setTime] = useState({soat: "00", daqiqa: "00", soniya: "00"})
+    const selectedTopicData = topicsData.find((topic) => topic.maintopicname === selectedMaintopic)
+    const subtopics = selectedTopicData ? selectedTopicData.subtopics : []
+    const [time, setTime] = useState({ soat: "00", daqiqa: "00", soniya: "00" })
     let timeSeconds = +time.soat * 60 * 60 + +time.daqiqa * 60 + +time.soniya
     let selectedSubTopicNames = []
-    selectedSubtopics.forEach(subtopic => {
+    selectedSubtopics.forEach((subtopic) => {
         selectedSubTopicNames.push(subtopic.subtopicname)
     })
-    const {isPending, error, data} = useQuery({
-        queryKey: ['test/getfulltestdb-by-id', "abituriyent"],
-        queryFn: () =>fetchData("abituriyent")
+    const { isPending, error, data } = useQuery({
+        queryKey: ["test/getfulltestdb-by-id", "abituriyent"],
+        queryFn: () => fetchData("abituriyent")
     })
     useEffect(() => {
         if (data) {
-            setTopicsData(data);
+            setTopicsData(data)
         }
-    }, [data]);
+    }, [data])
     const handleInputChange = (e, unit) => {
         let value = e.target.value
         value = value.replace(/^0+/, "")
@@ -60,7 +56,7 @@ function AbituriyentPage(props) {
         const validValue = Math.min(Math.max(numValue, 0), max)
         const formattedValue = validValue.toString().padStart(2, "0")
 
-        setTime((prevTime) => ({...prevTime, [unit]: formattedValue}))
+        setTime((prevTime) => ({ ...prevTime, [unit]: formattedValue }))
     }
     const handleStart = async () => {
         let timeSeconds = +time.soat * 60 * 60 + +time.daqiqa * 60 + +time.soniya
@@ -68,6 +64,7 @@ function AbituriyentPage(props) {
         await fetch(`${import.meta.env.VITE_SERVER}/test/start/abituriyent`, {
             method: "post",
             headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -76,18 +73,18 @@ function AbituriyentPage(props) {
                 userEmail: user.email,
                 numberOfQuestions: numQuestions,
                 userId: user._id,
-                testType:"abituriyent"
+                testType: "abituriyent"
             })
         })
-            .then(res => res.json())
-            .then(data => {
+            .then((res) => res.json())
+            .then((data) => {
                 if (data.error) {
                     setLoadingforBtn(false)
                     toast({
                         title: data.error,
                         variant: "destructive",
                         description: data.additional,
-                        duration: 4000,
+                        duration: 4000
                     })
                     return
                 }
@@ -101,9 +98,7 @@ function AbituriyentPage(props) {
     }
 
     if (isPending) {
-        return (
-            <Loader variant={"big"}/>
-        )
+        return <Loader variant={"big"} />
     }
 
     return (
@@ -111,42 +106,64 @@ function AbituriyentPage(props) {
             <div className="mx-auto w-full">
                 <Card className="bg-white max-w-6xl shadow-lg mx-auto rounded-lg overflow-hidden">
                     <div className={`mx-auto mt-8 p-6 bg-white rounded-lg shadow-md`}>
-                        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Test yechish uchun bo'lim,
-                            mavzu va vaqtni tanlang</h2>
-                        {selectedSubTopicNames.length > 0 && (<div className="mb-3 p-2 bg-muted rounded-md">
-                            <p className="font-medium mb-1">Tanlangan mavzular:</p>
-                            <div className="flex flex-wrap gap-1">
-                                {selectedSubTopicNames.map((topic) => (<span key={topic}
-                                                                             className="bg-primary/10 text-primary px-2 py-1 rounded text-sm">
-                      {topic}
-                    </span>))}
+                        <h1 className={`text-2xl font-bold text-center text-gray-800`}>Abituriyent</h1>
+                        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+                            Test yechish uchun bo'lim, mavzu va vaqtni tanlang
+                        </h2>
+                        {selectedSubTopicNames.length > 0 && (
+                            <div className="mb-3 p-2 bg-muted rounded-md">
+                                <p className="font-medium mb-1">Tanlangan mavzular:</p>
+                                <div className="flex flex-wrap gap-1">
+                                    {selectedSubTopicNames.map((topic) => (
+                                        <span
+                                            key={topic}
+                                            className="bg-primary/10 text-primary px-2 py-1 rounded text-sm"
+                                        >
+                                            {topic}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
-                        </div>)}
+                        )}
                         <div className="grid grid-cols-2 gap-4 pb-7 mb-4 border-b-2 border-gray-200">
                             <div>
                                 <div className={`mb-3`}>
                                     <Label htmlFor="maintopic">Bo'limni tanlang </Label>
-                                    {/*onSelect={(event)=>event.preventDefault()}*/}
-                                    <Select className={`z-50`} id="maintopic" value={selectedMaintopic}
-                                            onValueChange={(value) => {
-                                                setSelectedMaintopic(value);
-                                                setSelectedSubtopics([]);
-                                            }}>
+                                    <Select
+                                        className={`z-50`}
+                                        id="maintopic"
+                                        value={selectedMaintopic}
+                                        onValueChange={(value) => {
+                                            setSelectedMaintopic(value)
+                                            setSelectedSubtopics([])
+                                        }}
+                                        disabled={topicsData && topicsData.length === 0}
+                                    >
                                         <SelectTrigger className="min-w-full outline-none">
-                                            <SelectValue placeholder="Bo'limlar"/>
+                                            <SelectValue
+                                                placeholder={
+                                                    topicsData && topicsData.length > 0
+                                                        ? "Bo'limlar"
+                                                        : "Bo'limlar mavjud emas"
+                                                }
+                                            />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {topicsData.map((topic, index) => (
-                                                <SelectItem key={index}
-                                                            value={topic.maintopicname}>{topic.maintopicname}</SelectItem>
-                                            ))}
+                                            {topicsData &&
+                                                topicsData.map((topic, index) => (
+                                                    <SelectItem key={index} value={topic.maintopicname}>
+                                                        {topic.maintopicname}
+                                                    </SelectItem>
+                                                ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="flex mx-auto justify-center mb-3">
                                     <div className={`w-full`}>
-                                        <Label htmlFor="numQuestions"
-                                               className="block text-sm font-medium text-gray-700">
+                                        <Label
+                                            htmlFor="numQuestions"
+                                            className="block text-sm font-medium text-gray-700"
+                                        >
                                             Savollar soni
                                         </Label>
                                         <div className="flex items-center mt-1">
@@ -156,7 +173,7 @@ function AbituriyentPage(props) {
                                                 className="rounded-r-none"
                                                 variant="outline"
                                             >
-                                                <Minus className="h-4 w-4"/>
+                                                <Minus className="h-4 w-4" />
                                             </Button>
                                             <Input
                                                 type="number"
@@ -172,16 +189,18 @@ function AbituriyentPage(props) {
                                                 className="rounded-l-none"
                                                 variant="outline"
                                             >
-                                                <Plus className="h-4 w-4"/>
+                                                <Plus className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="mb-3 grid grid-cols-3 gap-4">
-                                    {(["soat", "daqiqa", "soniya"]).map((unit) => (
+                                    {["soat", "daqiqa", "soniya"].map((unit) => (
                                         <div key={unit} className="space-y-2">
-                                            <Label htmlFor={unit}
-                                                   className="text-sm font-medium text-gray-700 capitalize">
+                                            <Label
+                                                htmlFor={unit}
+                                                className="text-sm font-medium text-gray-700 capitalize"
+                                            >
                                                 {unit}
                                             </Label>
                                             <Input
@@ -203,50 +222,45 @@ function AbituriyentPage(props) {
                                 <Label>Mavzularni tanlang</Label>
                                 <div className="max-h-52 overflow-y-auto">
                                     {selectedMaintopic && subtopics.length > 0 ? (
-                                            <div className="space-y-2">
-                                                {
-                                                    subtopics.map(subtopic => (
-                                                        <div key={subtopic.subtopicname}
-                                                             className="flex items-center space-x-2">
-                                                            <Checkbox
-                                                                id={subtopic.subtopicname}
-                                                                checked={selectedSubtopics.includes(subtopic)}
-                                                                onCheckedChange={() => handleItemToggle(subtopic)}
-                                                            />
-                                                            <label
-                                                                htmlFor={subtopic.subtopicname}
-                                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                            >
-                                                                {subtopic.subtopicname}
-                                                            </label>
-                                                        </div>
-                                                    ))
-                                                }
-
-
-                                            </div>
-                                        )
-                                        :
+                                        <div className="space-y-2">
+                                            {subtopics.map((subtopic) => (
+                                                <div
+                                                    key={subtopic.subtopicname}
+                                                    className="flex items-center space-x-2"
+                                                >
+                                                    <Checkbox
+                                                        id={subtopic.subtopicname}
+                                                        checked={selectedSubtopics.includes(subtopic)}
+                                                        onCheckedChange={() => handleItemToggle(subtopic)}
+                                                    />
+                                                    <label
+                                                        htmlFor={subtopic.subtopicname}
+                                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    >
+                                                        {subtopic.subtopicname}
+                                                    </label>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
                                         <Label>Bu bo'limda mavzular yo'q</Label>
-                                    }
+                                    )}
                                 </div>
                             </div>
                         </div>
 
-
                         <div>
                             <Button disabled={loadingforBtn && true} className={`w-full`} onClick={handleStart}>
                                 Testni boshlash
-                                {loadingforBtn ? <Loader2 className="ml-2 h-4 w-4 animate-spin"/> : ""}
+                                {loadingforBtn ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : ""}
                             </Button>
-
                         </div>
                         {/*)}*/}
                     </div>
                 </Card>
             </div>
         </div>
-    );
+    )
 }
 
-export default AbituriyentPage;
+export default AbituriyentPage

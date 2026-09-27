@@ -1,10 +1,10 @@
 import React from 'react';
-import PhysicsHero from "@/components/layout/PhysicsHero.jsx";
+import ColorfulPhysicsHero from '../layout/ColorfulPhysicsHero';
 
 function HomePage() {
     return (
         <>
-            <PhysicsHero />
+            <ColorfulPhysicsHero />
         </>
     );
 }

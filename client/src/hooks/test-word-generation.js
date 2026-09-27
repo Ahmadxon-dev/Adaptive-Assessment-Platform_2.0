@@ -10,9 +10,8 @@ import {
     TextRun,
     WidthType,
 } from "docx";
-import QRCode from "qrcode";
 
-export const generateTestWordDocs = async (variations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData,uuid) => {
+export const generateTestWordDocs = async (variations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, uuid) => {
     const urls = [];
 
     for (const [index, questions] of variations.entries()) {
@@ -280,7 +279,7 @@ export const generateTestWordDocs = async (variations, zagolovokText, setPdfUrls
     setZagolovokText("");
 };
 
-export const generateAnswersWord = async (variations, setAnswersUrl, encryptData, uuid) => {
+export const generateAnswersWord = async (variations, setAnswersUrl, uuid) => {
     const children = [];
     children.push(
         new Paragraph({
@@ -351,7 +350,7 @@ export const generateAnswersWord = async (variations, setAnswersUrl, encryptData
 
 
 
-export const generateCombinedTestWord = async (variations, zagolovokText, setCombinedUrl, encryptData, uuid) => {
+export const generateCombinedTestWord = async (variations, zagolovokText, setCombinedUrl,  uuid) => {
     const allSections = [];
 
     for (const [index, questions] of variations.entries()) {
@@ -607,7 +606,7 @@ export const generateCombinedTestWord = async (variations, zagolovokText, setCom
 
 // logic for open-ended questions
 
-export const generateOpenEndedWord = async (variations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData,uuid) =>{
+export const generateOpenEndedWord = async (variations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, uuid) =>{
     const urls = [];
 
     for (const [index, questions] of variations.entries()) {
@@ -868,7 +867,7 @@ export const generateOpenEndedWord = async (variations, zagolovokText, setPdfUrl
     setZagolovokText("");
 }
 
-export const generateOpenEndedAnswers = async (variations, setAnswersUrl, encryptData, uuid) =>{
+export const generateOpenEndedAnswers = async (variations, setAnswersUrl,  uuid) =>{
     const children = [];
     children.push(
         new Paragraph({
@@ -948,7 +947,7 @@ export const generateOpenEndedAnswers = async (variations, setAnswersUrl, encryp
 }
 
 
-export const generateOpenEndedCombinedWord = async (variations, zagolovokText, setCombinedUrl, encryptData, uuid) =>{
+export const generateOpenEndedCombinedWord = async (variations, zagolovokText, setCombinedUrl,  uuid) =>{
     const allSections = [];
 
     for (const [index, questions] of variations.entries()) {

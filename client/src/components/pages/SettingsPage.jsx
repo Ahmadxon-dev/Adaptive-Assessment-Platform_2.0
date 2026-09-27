@@ -1,46 +1,62 @@
-import React, {useState} from 'react';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import {Label} from "@/components/ui/label.jsx";
-import {Input} from "@/components/ui/input.jsx";
-import {Button} from "@/components/ui/button.jsx";
-import {useDispatch, useSelector} from "react-redux";
-import {toast} from "@/hooks/use-toast.js";
-import {Eye, EyeOff, Lock, Save, User} from "lucide-react"
-import {setUser} from "@/features/user/userSlice.js";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import React, { useEffect, useState } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.jsx"
+import { Label } from "@/components/ui/label.jsx"
+import { Input } from "@/components/ui/input.jsx"
+import { Button } from "@/components/ui/button.jsx"
+import { useDispatch, useSelector } from "react-redux"
+import { toast } from "@/hooks/use-toast.js"
+import { Eye, EyeOff, Lock, Save, User } from "lucide-react"
+import { setUser } from "@/features/user/userSlice.js"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function SettingsPage(props) {
-    const [newName, setNewName] = useState("")
     const [isLoading, setIsLoading] = useState(false)
-    const user = useSelector(state => state.user)
+    const user = useSelector((state) => state.user)
+    const [newName, setNewName] = useState(user.name)
     const dispatch = useDispatch()
     const [currentPassword, setCurrentPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [showCurrentPassword, setShowCurrentPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
-
     const handlePasswordSubmit = async (e) => {
         e.preventDefault()
         setIsLoading(true)
+        if (currentPassword.length < 8 || newPassword.length < 8) {
+            toast({
+                title: "Parol kamida 8 ta belgidan iborat bo'lishi kerak",
+                variant: "destructive"
+            })
+            setIsLoading(false)
+            return
+        }
         await fetch(`${import.meta.env.VITE_SERVER}/user/profile/password/edit`, {
-            method: "put", headers: {
+            method: "put",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json"
-            }, body: JSON.stringify({
-                currentPassword, newPassword, userId: user._id
+            },
+            body: JSON.stringify({
+                currentPassword,
+                newPassword,
+                userId: user._id
             })
         })
-            .then(res => res.json())
-            .then(data => {
+            .then((res) => res.json())
+            .then((data) => {
                 if (data.msg) {
                     toast({
-                        title: data.msg, variant: "success", duration: 4000
+                        title: data.msg,
+                        variant: "success",
+                        duration: 4000
                     })
                     dispatch(setUser(data.user))
                     setCurrentPassword("")
                     setNewPassword("")
                 } else {
                     toast({
-                        title: data.error, variant: "destructive", duration: 4000
+                        title: data.error,
+                        variant: "destructive",
+                        duration: 4000
                     })
                 }
                 setIsLoading(false)
@@ -50,23 +66,42 @@ function SettingsPage(props) {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setIsLoading(true)
+        if (newName.length < 3) {
+            toast({
+                title: "Ism kamida 3 ta belgidan iborat bo'lishi kerak",
+                variant: "destructive",
+                duration: 4000
+            })
+            setIsLoading(false)
+            return
+        }
         await fetch(`${import.meta.env.VITE_SERVER}/user/profile/name/edit`, {
-            method: "put", headers: {
+            method: "put",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json"
-            }, body: JSON.stringify({
+            },
+            body: JSON.stringify({
                 userId: user._id,
                 newName
             })
         })
-            .then(res => res.json())
-            .then(data => {
+            .then((res) => res.json())
+            .then((data) => {
                 toast({
-                    title: data.msg, variant: "success"
+                    title: data.msg,
+                    variant: "success"
                 })
                 dispatch(setUser(data.user))
+                setNewName(data.user.name)
                 setIsLoading(false)
             })
     }
+    useEffect(() => {
+        if (user?.name) {
+            setNewName(user.name)
+        }
+    }, [user?.name])
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
             <div className="container max-w-4xl px-4 py-12 mx-auto">
@@ -77,11 +112,11 @@ function SettingsPage(props) {
                 <Tabs defaultValue="personal" className="space-y-6">
                     <TabsList className="grid w-full grid-cols-2 mb-8">
                         <TabsTrigger value="personal" className="text-sm sm:text-base">
-                            <User className="w-4 h-4 mr-2"/>
+                            <User className="w-4 h-4 mr-2" />
                             Shaxsiy ma'lumotlar
                         </TabsTrigger>
                         <TabsTrigger value="security" className="text-sm sm:text-base">
-                            <Lock className="w-4 h-4 mr-2"/>
+                            <Lock className="w-4 h-4 mr-2" />
                             Xavfsizlik
                         </TabsTrigger>
                     </TabsList>
@@ -99,7 +134,7 @@ function SettingsPage(props) {
                                         </Label>
                                         <Input
                                             id="name"
-                                            defaultValue={user.name}
+                                            value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
                                             className="transition-all focus:ring-2 focus:ring-offset-1 focus:ring-primary"
                                         />
@@ -111,28 +146,32 @@ function SettingsPage(props) {
                                         disabled={isLoading || newName === "" || newName === user.name}
                                         className="transition-all"
                                     >
-                                        {isLoading ? (<span className="flex items-center gap-2">
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                          <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="none"
-                          />
-                          <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        Saqlanmoqda...
-                      </span>) : (<span className="flex items-center gap-2">
-                        <Save className="w-4 h-4"/>
-                        Saqlash
-                      </span>)}
+                                        {isLoading ? (
+                                            <span className="flex items-center gap-2">
+                                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                        fill="none"
+                                                    />
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    />
+                                                </svg>
+                                                Saqlanmoqda...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Save className="w-4 h-4" />
+                                                Saqlash
+                                            </span>
+                                        )}
                                     </Button>
                                 </CardFooter>
                             </form>
@@ -167,10 +206,13 @@ function SettingsPage(props) {
                                                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                                             >
                                                 {showCurrentPassword ? (
-                                                    <EyeOff className="w-4 h-4 text-muted-foreground"/>) : (
-                                                    <Eye className="w-4 h-4 text-muted-foreground"/>)}
-                                                <span
-                                                    className="sr-only">{showCurrentPassword ? "Hide password" : "Show password"}</span>
+                                                    <EyeOff className="w-4 h-4 text-muted-foreground" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4 text-muted-foreground" />
+                                                )}
+                                                <span className="sr-only">
+                                                    {showCurrentPassword ? "Hide password" : "Show password"}
+                                                </span>
                                             </Button>
                                         </div>
                                     </div>
@@ -196,10 +238,13 @@ function SettingsPage(props) {
                                                 onClick={() => setShowNewPassword(!showNewPassword)}
                                             >
                                                 {showNewPassword ? (
-                                                    <EyeOff className="w-4 h-4 text-muted-foreground"/>) : (
-                                                    <Eye className="w-4 h-4 text-muted-foreground"/>)}
-                                                <span
-                                                    className="sr-only">{showNewPassword ? "Hide password" : "Show password"}</span>
+                                                    <EyeOff className="w-4 h-4 text-muted-foreground" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4 text-muted-foreground" />
+                                                )}
+                                                <span className="sr-only">
+                                                    {showNewPassword ? "Hide password" : "Show password"}
+                                                </span>
                                             </Button>
                                         </div>
                                     </div>
@@ -210,28 +255,32 @@ function SettingsPage(props) {
                                         className="w-full sm:w-auto transition-all"
                                         disabled={!currentPassword || !newPassword || isLoading}
                                     >
-                                        {isLoading ? (<span className="flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                          <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="none"
-                          />
-                          <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-                        Saqlanmoqda...
-                      </span>) : (<span className="flex items-center justify-center gap-2">
-                        <Lock className="w-4 h-4"/>
-                        Parolni O'zgartirish
-                      </span>)}
+                                        {isLoading ? (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                        fill="none"
+                                                    />
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    />
+                                                </svg>
+                                                Saqlanmoqda...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center justify-center gap-2">
+                                                <Lock className="w-4 h-4" />
+                                                Parolni O'zgartirish
+                                            </span>
+                                        )}
                                     </Button>
                                 </CardFooter>
                             </form>
@@ -240,7 +289,7 @@ function SettingsPage(props) {
                 </Tabs>
             </div>
         </div>
-    );
+    )
 }
 
-export default SettingsPage;
+export default SettingsPage

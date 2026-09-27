@@ -14,6 +14,7 @@ const addBsb = async ({grade, term_number}) =>{
     const response = await fetch(`${import.meta.env.VITE_SERVER}/grade/addbsb`, {
         method:"POST",
         headers:{
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -27,6 +28,7 @@ const addChsb = async ({grade, term_number}) =>{
     const response = await fetch(`${import.meta.env.VITE_SERVER}/grade/addchsb`, {
         method:"POST",
         headers:{
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -40,6 +42,7 @@ const removeBsb = async ({grade, term_number, id})=>{
     const res = await fetch(`${import.meta.env.VITE_SERVER}/grade/deletebsb/${id}`, {
         method:'DELETE',
         headers:{
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type":"application/json"
         },
         body:JSON.stringify({grade, term_number, id})
@@ -50,6 +53,7 @@ const removeChsb = async ({grade, term_number}) =>{
     const res = await fetch(`${import.meta.env.VITE_SERVER}/grade/deletechsb`, {
         method:'DELETE',
         headers:{
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type":"application/json"
         },
         body:JSON.stringify({grade, term_number})

@@ -3,7 +3,7 @@ const router = Router()
 const Person = require("../models/Person")
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const authMiddleWare = require("../middleware/auth")
+const { authMiddleware } = require('../middleware/auth')
 
 router.post("/signup", async (req,res)=>{
     const {email, password, name} = req.body
@@ -67,26 +67,27 @@ router.post("/signin", async (req,res)=>{
         })
 })
 
-router.get("/getuser/:token", async (req,res)=>{
-    const {token} = req.params
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    if (decoded._id){
-        await Person.findById(decoded._id)
-            .then(user=>{
-                if (!user) return res.status(401).json({error:"Wrong token"})
-                const {email, name, role, _id} = user
-                return res.status(200).json({email, name, role, _id})
-            })
-    }else{
-        return res.status(401).json({error:"Wrong Token"})
-    }
+// router.get("/getuser/:token", async (req,res)=>{
+//     const {token} = req.params
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET)
+//     if (decoded._id){
+//         await Person.findById(decoded._id)
+//             .then(user=>{
+//                 if (!user) return res.status(401).json({error:"Wrong token"})
+//                 const {email, name, role, _id} = user
+//                 return res.status(200).json({email, name, role, _id})
+//             })
+//     }else{
+//         return res.status(401).json({error:"Wrong Token"})
+//     }
 
-})
+// })
 
-router.get("/profile", authMiddleWare, async (req,res)=>{
+router.get("/profile", authMiddleware, async (req,res)=>{
+    const user = await Person.findById(req.user._id).select('-password -isAbleToChangeRoles -createdAt -updatedAt')
     res.json({
         message: "Profile fetched successfully",
-        user: req.user,
+        user,
     });
 })
 module.exports = router

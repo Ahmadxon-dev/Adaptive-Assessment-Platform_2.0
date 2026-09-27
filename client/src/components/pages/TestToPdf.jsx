@@ -12,26 +12,21 @@ import { v4 as uuidv4 } from 'uuid';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion.jsx";
 import Loader from "@/components/ui/Loader.jsx";
 import {useQuery} from "@tanstack/react-query";
-import {generateAnswersWord, generateTestWordDocs} from "@/hooks/test-word-generation.js";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.jsx";
 
-const secretKey = `${import.meta.env.VITE_SECRET_KEY}`;
+// const secretKey = `${import.meta.env.VITE_SECRET_KEY}`;
 
-const encryptData = (data) => {
-    return CryptoJS.AES.encrypt(data, secretKey).toString();
-};
+// const encryptData = (data) => {
+//     return CryptoJS.AES.encrypt(data, secretKey).toString();
+// };
 
-const decryptData = (encryptedData) => {
-    try {
-        const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
-        return bytes.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-        console.error("Decryption error:", error);
-        return null;
-    }
-};
+
 const fetchData = async ()=>{
-    const response = await fetch(`${import.meta.env.VITE_SERVER}/test/getfulltestdb-by-id`)
+    const response = await fetch(`${import.meta.env.VITE_SERVER}/test/getfulltestdb-by-id`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        }
+    })
     return response.json()
 }
 const TestToPdfForOpenEnded = lazy(()=> import("./TestToPdfForOpenEnded.jsx"))
@@ -131,9 +126,9 @@ function TestToPdf() {
 
             testVariations.push(shuffledQuestions);
         }
-        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid);
-        generateAnswersWord(testVariations, setAnswersUrl, encryptData, uuid);
-        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid);
+        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid);
+        generateAnswersWord(testVariations, setAnswersUrl,  uuid);
+        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl,  uuid);
     };
 
 
@@ -218,9 +213,9 @@ function TestToPdf() {
             });
         });
 
-        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid);
-        generateAnswersWord(testVariations, setAnswersUrl, encryptData, uuid);
-        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid);
+        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid);
+        generateAnswersWord(testVariations, setAnswersUrl,  uuid);
+        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl,  uuid);
         setBtnLoader(false);
     };
 
@@ -307,9 +302,9 @@ function TestToPdf() {
             });
         });
 
-        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText, encryptData, uuid);
-        generateAnswersWord(testVariations, setAnswersUrl, encryptData, uuid);
-        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl, encryptData, uuid);
+        generateTestWordDocs(testVariations, zagolovokText, setPdfUrls, setBtnLoader, setZagolovokText,  uuid);
+        generateAnswersWord(testVariations, setAnswersUrl,  uuid);
+        generateCombinedTestWord(testVariations, zagolovokText, setCombinedUrl,  uuid);
         setBtnLoader(false);
     };
 

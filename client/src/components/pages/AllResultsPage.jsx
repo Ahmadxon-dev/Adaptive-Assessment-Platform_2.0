@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react"
-import {ArrowUpDown, ChevronDown, Clock, Download, Eye, Search, User} from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { ArrowUpDown, ChevronDown, Clock, Download, Eye, Search, User } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardDescription, CardTitle } from "@/components/ui/card"
@@ -7,52 +7,69 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import {Link, useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
-import Loader from "@/components/ui/Loader.jsx";
-import {useQuery} from "@tanstack/react-query";
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
+import { useSelector } from "react-redux"
+import Loader from "@/components/ui/Loader.jsx"
+import { useQuery } from "@tanstack/react-query"
+import PaginationComponent from "../shared/pagination"
+import { AllTestResultsPageSize } from "@/lib/constants"
 
-const fetchAllResults =async ()=>{
-    const res = await fetch(`${import.meta.env.VITE_SERVER}/test/all-results`)
+const fetchAllResults = async (page) => {
+    const res = await fetch(
+        `${import.meta.env.VITE_SERVER}/test/all-results?page=${page}&pageSize=${AllTestResultsPageSize}`,
+        {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        }
+    )
     return res.json()
 }
 function AllResultsPage(props) {
     const [searchTerm, setSearchTerm] = useState("")
     const [sortBy, setSortBy] = useState("date")
     const [sortDirection, setSortDirection] = useState("desc")
-    const [quizResults,setData] = useState([])
-    const [loading, setLoading] = useState(true)
-    const user = useSelector(state => state.user)
+    const [quizResults, setData] = useState([])
+    const user = useSelector((state) => state.user)
     const navigate = useNavigate()
-    const {data:allResultsData, isPending} = useQuery({queryKey:["test/all-results"], queryFn:fetchAllResults})
+    const [searchParams, setSearchParams] = useSearchParams()
+    const { data: { test: allResultsData, isNext } = {}, isPending } = useQuery({
+        queryKey: ["test/all-results", searchParams.get("page"), AllTestResultsPageSize],
+        queryFn: () => fetchAllResults(searchParams.get("page"))
+    })
     if (user.role === "user" || user.role === "admin") {
-        navigate("/")
+        navigate("/home")
     }
     const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        const minutes = Math.floor(seconds / 60)
+        const remainingSeconds = seconds % 60
+        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
     }
-    useEffect(()=>{
-        if (allResultsData){
-            const transformedData = allResultsData.map((result) => {
-                return {
-                    id: result._id,
-                    userName: result.userId.name,
-                    date: result.startTime,
-                    role: result.userId.role,
-                    topics: result.subtopicname,
-                    questions: result.questions.length,
-                    score: result.result,
-                    grade: result.grade,
-                    testType:result.testType,
-                    term: result.term,
-                    timeSpent: formatTime(result.remainingTime),
-                }
-            });
-            setData(transformedData.filter(item=> item.role!=="bosh admin"));
+    useEffect(() => {
+        // navigate('?page=1')
+        if (!searchParams.get("page")) {
+            setSearchParams({ page: "1" }, { replace: true })
         }
-    }, [isPending])
+    }, [searchParams, setSearchParams])
+    useEffect(() => {
+        if (allResultsData) {
+            const transformedData = allResultsData.map((result) => ({
+                id: result._id,
+                userName: result.userId.name,
+                date: result.startTime,
+                role: result.userId.role,
+                topics: result.subtopicname,
+                questions: result.questions.length,
+                score: result.result,
+                grade: result.grade,
+                testType: result.testType,
+                term: result.term,
+                timeSpent: formatTime(result.remainingTime)
+            }))
+
+            setData(transformedData.filter((item) => item.role !== "bosh admin"))
+        }
+    }, [allResultsData])
     const sortData = (data, sortBy, direction) => {
         return [...data].sort((a, b) => {
             if (sortBy === "score" || sortBy === "questions") {
@@ -72,7 +89,7 @@ function AllResultsPage(props) {
             (item) =>
                 item.userName.toLowerCase().includes(term.toLowerCase()) ||
                 item.role.toLowerCase().includes(term.toLowerCase()) ||
-                item.topics.some((topic) => topic.toLowerCase().includes(term.toLowerCase())),
+                item.topics.some((topic) => topic.toLowerCase().includes(term.toLowerCase()))
         )
     }
 
@@ -95,14 +112,13 @@ function AllResultsPage(props) {
         return date.toLocaleDateString() + ", " + date.toLocaleTimeString()
     }
 
-    if (isPending){
+    if (isPending) {
         return <Loader variant={"big"} />
     }
 
     return (
         <div className="min-h-screen bg-gray-100">
             <div className="container mx-auto py-6 px-4">
-
                 <div className="grid gap-6 mb-8 md:grid-cols-3">
                     <Card className="border-t-4 border-blue-500 overflow-hidden">
                         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-blue-100">
@@ -113,13 +129,17 @@ function AllResultsPage(props) {
                     <Card className="border-t-4 border-green-500 overflow-hidden">
                         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-blue-100">
                             <CardDescription>User</CardDescription>
-                            <CardTitle className="text-3xl text-green-700">{quizResults.filter((item) => item.role === "user").length}</CardTitle>
+                            <CardTitle className="text-3xl text-green-700">
+                                {quizResults.filter((item) => item.role === "user").length}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="border-t-4 border-yellow-500 overflow-hidden">
                         <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-blue-100">
                             <CardDescription>Admin</CardDescription>
-                            <CardTitle className="text-3xl text-yellow-700">{quizResults.filter((item) => item.role === "admin").length}</CardTitle>
+                            <CardTitle className="text-3xl text-yellow-700">
+                                {quizResults.filter((item) => item.role === "admin").length}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
@@ -159,19 +179,31 @@ function AllResultsPage(props) {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[180px]">
-                                        <Button variant="ghost" className="gap-1 font-medium" onClick={() => handleSort("userName")}>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-1 font-medium"
+                                            onClick={() => handleSort("userName")}
+                                        >
                                             Foydalanuvchi Ismi
                                             <ArrowUpDown className="h-4 w-4" />
                                         </Button>
                                     </TableHead>
                                     <TableHead>
-                                        <Button variant="ghost" className="gap-1 font-medium" onClick={() => handleSort("date")}>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-1 font-medium"
+                                            onClick={() => handleSort("date")}
+                                        >
                                             Sanasi
                                             <ArrowUpDown className="h-4 w-4" />
                                         </Button>
                                     </TableHead>
                                     <TableHead>
-                                        <Button variant="ghost" className="gap-1 font-medium" onClick={() => handleSort("role")}>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-1 font-medium"
+                                            onClick={() => handleSort("role")}
+                                        >
                                             Rol
                                             <ArrowUpDown className="h-4 w-4" />
                                         </Button>
@@ -179,13 +211,21 @@ function AllResultsPage(props) {
                                     <TableHead>Nazorat turi</TableHead>
                                     <TableHead>Mavzular</TableHead>
                                     <TableHead className="text-right">
-                                        <Button variant="ghost" className="gap-1 font-medium" onClick={() => handleSort("questions")}>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-1 font-medium"
+                                            onClick={() => handleSort("questions")}
+                                        >
                                             Savollar Soni
                                             <ArrowUpDown className="h-4 w-4" />
                                         </Button>
                                     </TableHead>
                                     <TableHead className="text-right">
-                                        <Button variant="ghost" className="gap-1 font-medium" onClick={() => handleSort("score")}>
+                                        <Button
+                                            variant="ghost"
+                                            className="gap-1 font-medium"
+                                            onClick={() => handleSort("score")}
+                                        >
                                             Natija
                                             <ArrowUpDown className="h-4 w-4" />
                                         </Button>
@@ -197,7 +237,10 @@ function AllResultsPage(props) {
                             <TableBody>
                                 {processedData.length > 0 ? (
                                     processedData.map((result, index) => (
-                                        <TableRow key={result.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                        <TableRow
+                                            key={result.id}
+                                            className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+                                        >
                                             <TableCell className="font-medium">{result.userName}</TableCell>
                                             <TableCell>{formatDate(result.date)}</TableCell>
                                             <TableCell>
@@ -212,7 +255,9 @@ function AllResultsPage(props) {
                                                     {result.role}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell>{result.grade}-sinf, {result.term}-chorak, {result.testType}</TableCell>
+                                            <TableCell>
+                                                {result.grade}-sinf, {result.term}-chorak, {result.testType}
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {result.topics.map((topic, index) => (
@@ -228,20 +273,20 @@ function AllResultsPage(props) {
                                             </TableCell>
                                             <TableCell className="text-right">{result.questions}</TableCell>
                                             <TableCell className="text-right">
-                        <span
-                            className={
-                                result.score / result.questions >= 0.8
-                                    ? "text-green-600 font-medium"
-                                    : result.score / result.questions >= 0.6
-                                        ? "text-amber-600 font-medium"
-                                        : "text-red-600 font-medium"
-                            }
-                        >
-                          {result.score}
-                        </span>
+                                                <span
+                                                    className={
+                                                        result.score / result.questions >= 0.8
+                                                            ? "text-green-600 font-medium"
+                                                            : result.score / result.questions >= 0.6
+                                                            ? "text-amber-600 font-medium"
+                                                            : "text-red-600 font-medium"
+                                                    }
+                                                >
+                                                    {result.score}
+                                                </span>
                                                 <span className="text-muted-foreground text-xs ml-1">
-                          ({Math.round((result.score / result.questions) * 100)}%)
-                        </span>
+                                                    ({Math.round((result.score / result.questions) * 100)}%)
+                                                </span>
                                             </TableCell>
                                             <TableCell className="text-right font-mono">{result.timeSpent}</TableCell>
                                             <TableCell className={`text-right`}>
@@ -256,7 +301,7 @@ function AllResultsPage(props) {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                        <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                                             Hech qanday natija topilmadi.
                                         </TableCell>
                                     </TableRow>
@@ -264,14 +309,14 @@ function AllResultsPage(props) {
                             </TableBody>
                         </Table>
                     </div>
-
-                    <div className="border-t text-sm text-muted-foreground">
-                        {/*Showing {processedData.length} ta {quizResults.length} results*/}
-                    </div>
                 </div>
+                <PaginationComponent
+                    isNext={isNext}
+                    pageNumber={searchParams.get("page") ? searchParams.get("page") : 1}
+                />
             </div>
         </div>
-    );
+    )
 }
 
-export default AllResultsPage;
+export default AllResultsPage

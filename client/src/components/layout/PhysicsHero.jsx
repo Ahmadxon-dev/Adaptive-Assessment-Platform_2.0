@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom"
 export default function PhysicsHero() {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
@@ -10,7 +10,7 @@ export default function PhysicsHero() {
             if (rect) {
                 setMousePosition({
                     x: ((e.clientX - rect.left) / rect.width) * 100,
-                    y: ((e.clientY - rect.top) / rect.height) * 100,
+                    y: ((e.clientY - rect.top) / rect.height) * 100
                 })
             }
         }
@@ -30,11 +30,10 @@ export default function PhysicsHero() {
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
+                animationDuration: `${6 + Math.random() * 4}s`
             }}
         />
     ))
-
     const formulas = ["E = mc²", "F = ma", "v = λf", "P = mv", "W = Fd", "Q = mcΔT"]
 
     return (
@@ -50,7 +49,7 @@ export default function PhysicsHero() {
                     style={{
                         left: `${20 + mousePosition.x * 0.1}%`,
                         top: `${10 + mousePosition.y * 0.1}%`,
-                        transform: "translate(-50%, -50%)",
+                        transform: "translate(-50%, -50%)"
                     }}
                 />
                 <div
@@ -59,7 +58,7 @@ export default function PhysicsHero() {
                         right: `${10 + mousePosition.x * 0.05}%`,
                         bottom: `${20 + mousePosition.y * 0.05}%`,
                         transform: "translate(50%, 50%)",
-                        animationDelay: "1s",
+                        animationDelay: "1s"
                     }}
                 />
 
@@ -75,7 +74,7 @@ export default function PhysicsHero() {
                             left: `${15 + index * 15}%`,
                             top: `${20 + index * 10}%`,
                             animationDelay: `${index * 0.5}s`,
-                            animationDuration: `${3 + index * 0.5}s`,
+                            animationDuration: `${3 + index * 0.5}s`
                         }}
                     >
                         {formula}
@@ -100,7 +99,12 @@ export default function PhysicsHero() {
                     {/* Orbit Ring 2 */}
                     <div
                         className="absolute w-60 h-60 border-2 border-purple-400/40 rounded-full animate-spin"
-                        style={{ animationDuration: "30s", animationDirection: "reverse", left: "-120px", top: "-120px" }}
+                        style={{
+                            animationDuration: "30s",
+                            animationDirection: "reverse",
+                            left: "-120px",
+                            top: "-120px"
+                        }}
                     >
                         <div
                             className="absolute w-2 h-2 bg-purple-300 rounded-full shadow-lg shadow-purple-300/70"
@@ -129,16 +133,17 @@ export default function PhysicsHero() {
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Main Heading */}
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent animate-pulse">
-              Koinot qonunlarini o‘rganing, bilimlaringizni sinang.
-            </span>
+                        <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent animate-pulse">
+                            Koinot qonunlarini o'rganing, bilimlaringizni sinang.
+                        </span>
                         <br />
                         {/*<span className="text-white/90">Unleashed</span>*/}
                     </h1>
 
                     {/* Subtitle */}
                     <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto leading-relaxed">
-                        Fizikaning asosiy tushunchalaridan boshlab murakkab mavzulargacha — hammasi bir joyda. Interaktiv darslar va testlar orqali bilim va amaliyotingizni yanada mustahkamlang.
+                        Fizikaning asosiy tushunchalaridan boshlab murakkab mavzulargacha — hammasi bir joyda.
+                        Interaktiv darslar va testlar orqali bilim va amaliyotingizni yanada mustahkamlang.
                     </p>
 
                     {/* CTA Buttons */}
@@ -148,9 +153,7 @@ export default function PhysicsHero() {
                             size="lg"
                             className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg shadow-cyan-400/40 transform hover:scale-105 transition-all duration-300"
                         >
-                            <Link to={"/gradelist"}>
-                                O‘rganishni boshlash
-                            </Link>
+                            <Link to={"/gradelist"}>O'rganishni boshlash</Link>
                         </Button>
                         <Button
                             asChild
@@ -158,9 +161,7 @@ export default function PhysicsHero() {
                             size="lg"
                             className="border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold rounded-full backdrop-blur-sm transform hover:scale-105 transition-all duration-300 bg-transparent"
                         >
-                            <Link to={"/guide"}>
-                                Demoni ko‘rish
-                            </Link>
+                            <Link to={"/guide"}>Demoni ko'rish</Link>
                         </Button>
                     </div>
                 </div>
@@ -185,14 +186,20 @@ export default function PhysicsHero() {
             </div>
 
             <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 1s ease-out;
-        }
-      `}</style>
+                @keyframes fade-in {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                .animate-fade-in {
+                    animation: fade-in 1s ease-out;
+                }
+            `}</style>
         </div>
     )
 }

@@ -11,6 +11,9 @@ h1 {
 body{
   @apply !min-w-full; /*for select responsiveness */
 }
+*, html, body{
+  scroll-behavior: smooth;
+}
 
 @layer base {
   :root {

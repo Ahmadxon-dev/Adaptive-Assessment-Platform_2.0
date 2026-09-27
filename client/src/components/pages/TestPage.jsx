@@ -1,9 +1,9 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef, useCallback} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {Loader2} from "lucide-react";
 import {useDispatch, useSelector} from "react-redux";
 import {removeAnswer, setTest, updateAnswer} from "@/features/test/testSlice.js";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label.jsx";
 import {Button} from "@/components/ui/button.jsx";
@@ -11,9 +11,6 @@ import Loader from "@/components/ui/Loader.jsx";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog.jsx";
 import {Input} from "@/components/ui/input.jsx";
@@ -54,11 +51,12 @@ function TestPage() {
         setSelectedOption(selectedAnswer);
         dispatch(updateAnswer({ index: currentIndex, answer:selectedAnswer }));
     };
-    const handleSubmit = async ()=>{
+    const handleSubmit = useCallback( async ()=>{
         setLoadingForSubmit(true);
         await fetch(`${import.meta.env.VITE_SERVER}/test/submit/${testId}`, {
             method: "PUT",
             headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -66,19 +64,19 @@ function TestPage() {
                 isCompleted: true,
                 answers
             }),
-        });
+        })
         sessionStorage.removeItem("timer");
         sessionStorage.removeItem("currentIndex");
         localStorage.removeItem(testId)
         setIsTestSubmitted(true);
         setLoadingForSubmit(false);
         navigate("/results");
-    }
+    }, [timeLeft, answers, testId, navigate])
 
 
     useEffect(() => {
         setLoading(true);
-        fetch(`${import.meta.env.VITE_SERVER}/test/${testId}`)
+        fetch(`${import.meta.env.VITE_SERVER}/test/${testId}`, { headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}})
             .then((res) => res.json())
             .then((data) => {
                 if (data.isCompleted){
@@ -109,7 +107,7 @@ function TestPage() {
                 setLoading(false);
                 // Optionally handle error state, e.g., display an error message
             });
-    }, [testId, isTestSubmitted, dispatch]);
+    }, [testId, isTestSubmitted, dispatch, navigate]);
 
     useEffect(() => {
         sessionStorage.setItem("timer", JSON.stringify(timeLeft));
@@ -175,7 +173,6 @@ function TestPage() {
             <Loader />
         );
     }
-
     return (
         <div className=" bg-gray-100 h-screen py-12 px-4 sm:px-6 lg:px-8">
             <Card className="w-full mx-auto">
@@ -258,7 +255,7 @@ function TestPage() {
 
                                     {test?.questions?.length > 0
                                         ? Object.values(test?.questions?.[currentIndex]?.options || {}).map((option, index) => (
-                                            <div key={index} className="flex items-center space-x-4">
+                                            <div key={option.text} className="flex items-center space-x-4">
                                                 <RadioGroupItem value={"option" + Number(index + 1)} id={`option-${index}`}/>
                                                 <Label htmlFor={`option-${index}`}
                                                        className="text-xl flex justify-between items-center">
