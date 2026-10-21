@@ -131,8 +131,9 @@ function ResultsPage(props) {
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {item.grade != null &&
+                                                            {(item.grade != null && item.grade != 'ixtisos-sinflar' ) &&
                                                                 `${item.grade}-sinf, ${item.term}-chorak, ${item.testType}`}
+                                                            { item.grade === 'ixtisos-sinflar' && `Ixtisos sinf, ${item.term}-chorak, ${item.testType}` }
                                                             {item.testType === "attestatsiya" &&
                                                                 item.testType.toUpperCase()}
                                                             {item.testType === "abituriyent" &&

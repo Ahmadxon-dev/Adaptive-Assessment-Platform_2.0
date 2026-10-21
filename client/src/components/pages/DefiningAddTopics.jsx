@@ -1,12 +1,20 @@
-import React from 'react'
 import {Button} from "@/components/ui/button.jsx";
-import {Link} from "react-router-dom";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import {Link, useNavigate} from "react-router-dom";
 
-function DefiningAddTopics(props) {
-    const allGrades = [7, 8, 9, 10, 11, 'Abituriyent', 'Attestatsiya']
+function DefiningAddTopics() {
+    const user = useSelector((state) => state.user)
+    const navigate = useNavigate()
+    const allGrades = [7, 8, 9, 10, 11, 'Abituriyent', 'Attestatsiya', 'Ixtisos Sinflar']
     const grades = allGrades.slice(0, 5)
-    const others = allGrades.slice(5,7)
+    const others = allGrades.slice(5)
 
+    useEffect(() => {
+        if (user.role === "user") {
+            navigate("/home")
+        }
+    }, [])
     return (
         <div className="bg-gray-100 h-screen">
             <div className="space-y-10 pt-20">
@@ -26,7 +34,7 @@ function DefiningAddTopics(props) {
                     {
                         others.map(element => {
                             return <Button key={element} asChild={true} className=" px-8 py-3 pb-4 text-2xl">
-                                <Link to={element.toLowerCase()} >
+                                <Link to={element === 'Ixtisos Sinflar'? 'ixtisos-sinflar': element.toLowerCase()} >
                                     {element}
                                 </Link>
                             </Button>

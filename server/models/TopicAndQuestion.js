@@ -3,7 +3,7 @@ const {Schema, model} = require("mongoose");
 
 
 const TopicAndQuestionSchema = new Schema({
-    gradeLevel:{ type: String, enum:['7', '8', '9', '10', '11', 'abituriyent', 'attestatsiya']},
+    gradeLevel:{ type: String, enum:['7', '8', '9', '10', '11', 'abituriyent', 'attestatsiya', 'ixtisos-sinflar']},
     maintopicname: { type: String, required: true },
     questionType:{
         type:String,

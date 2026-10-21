@@ -59,7 +59,7 @@ const TestSchema = new Schema({
     result:{type:Number, default:0},
     userEmail:{type:String},
     userId: { type: Schema.ObjectId, ref: 'Person', required: true },
-    grade: {type:Number, required:false},
+    grade: {type:String, required:false},
     testType: { type: String, required:false},
     term: {type: String, required:false}
 },  {timestamps:true, collection: "Tests"})

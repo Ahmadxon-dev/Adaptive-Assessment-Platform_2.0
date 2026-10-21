@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Button} from "@/components/ui/button.jsx";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import EachGradeAddTopic from "@/components/pages/EachGradeAddTopic.jsx";
+import { useSelector } from 'react-redux';
 
 function QuestionTypePage(props) {
     const params = useParams()
-
+    const navigate = useNavigate()
+    const user = useSelector((state) => state.user)    
     const questionTypes = ["multiple-choice", 'open-ended']
+    useEffect(() => {
+        if (user.role === "user") {
+            navigate("/home")
+        }
+    }, [])
+
 
 
     if (params.grade === "abituriyent" || params.grade === "attestatsiya"){

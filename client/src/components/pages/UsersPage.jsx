@@ -51,9 +51,11 @@ function UsersPage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const page = Number(searchParams.get("page") || 1)
     const { data: { people: fetchedUsers, isNext } = {}, isLoading } = useUsers(user, page)
-    if (user.role === "user") {
-        navigate("/home")
-    }
+    useEffect(() => {
+        if (user.role === "user") {
+            navigate("/home")
+        }
+    }, [])
     useEffect(() => {
         // navigate('?page=1')
         if (!searchParams.get("page")) {

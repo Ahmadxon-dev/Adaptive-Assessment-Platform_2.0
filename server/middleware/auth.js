@@ -22,7 +22,20 @@ function requireRole(...allowedRoles) {
     next()
   }
 }
+function validateMongoIdParam(paramName) {
+  return (req, res, next) => {
+    const id = req.params[paramName];
 
+    if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+      return res.status(400).json({
+        error: "Invalid ID"
+      });
+    }
+
+    next();
+  };
+
+}
 function requireSelfOrRole(...allowedRoles) {
   return (req, res, next) => {
     const isSelf = req.user?.id === req.params.userId

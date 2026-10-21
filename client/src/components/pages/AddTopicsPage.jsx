@@ -28,14 +28,16 @@ function AddTopicsPage({ data, grade, questionType }) {
     const [database, setDatabase] = useState(data)
     const user = useSelector((state) => state.user)
     const navigate = useNavigate()
-    if (user.role === "user") {
-        navigate("/home")
-    }
+    useEffect(() => {
+        if (user.role === "user") {
+            navigate("/home")
+        }
+    }, [])
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="text-3xl  mb-6">
                 {questionType === "open-ended" ? "Ochiq Test: " : "Yopiq Test: "}
-                {grade === "abituriyent" || grade === "attestatsiya" ? grade.toUpperCase() : `${grade}-sinf`} uchun
+                <span className="font-bold">{grade === "abituriyent" || grade === "attestatsiya" || grade === 'ixtisos-sinflar' ? grade.toUpperCase() : `${grade}-sinf`}</span> uchun
                 bo'limlar, mavzular va savollar qo'shish
             </h1>
             <Tabs defaultValue="main-topics">

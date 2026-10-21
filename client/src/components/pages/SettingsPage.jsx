@@ -82,7 +82,6 @@ function SettingsPage(props) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                userId: user._id,
                 newName
             })
         })

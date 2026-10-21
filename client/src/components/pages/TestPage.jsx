@@ -20,6 +20,7 @@ function TestPage() {
     const [answers, setAnswers] = useState([])
     const [loading, setLoading] = useState(true)
     const test = useSelector((state) => state.test.testData)
+    const user = useSelector((state) => state.user)
     const [loadingforEachQuestion, setLoadingforEachQuestion] = useState(false)
     const [isTestSubmitted, setIsTestSubmitted] = useState(false)
     const navigate = useNavigate()
@@ -82,6 +83,11 @@ function TestPage() {
                 if (data.isCompleted){
                     navigate("/results")
                 }
+                if(user._id !== null){
+                    if(data.userId !== user._id){
+                        return navigate("/home")
+                    }
+                }
                 dispatch(setTest(data));
                 let storedIndex = 0;
                 if (!isTestSubmitted) {
@@ -107,7 +113,7 @@ function TestPage() {
                 setLoading(false);
                 // Optionally handle error state, e.g., display an error message
             });
-    }, [testId, isTestSubmitted, dispatch, navigate]);
+    }, [testId, isTestSubmitted, dispatch, navigate, user._id]);
 
     useEffect(() => {
         sessionStorage.setItem("timer", JSON.stringify(timeLeft));

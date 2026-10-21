@@ -128,7 +128,7 @@ function DefiningTestPage() {
                 <Card className="bg-white max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
                     <div className={` mx-auto mt-8 p-6 bg-white rounded-lg shadow-md`}>
                         <h1 className={`text-2xl font-bold text-center text-gray-800`}>
-                            {grade}-sinf, {term}-chorak, {test}
+                            {grade==='ixtisos-sinflar'?'Ixtisos Sinflar,':`${grade}-sinf,`}  {term}-chorak, {test}
                         </h1>
                         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                             {questionType === "multiple-choice" ? `Yopiq test` : "Ochiq test"} yechish uchun bo'lim,

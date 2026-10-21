@@ -45,10 +45,11 @@ function AppLayout() {
 
 function App() {
     const dispatch = useDispatch()
-    const token = localStorage.getItem("token")
     const navigate = useNavigate()
+    const token = localStorage.getItem("token") 
     useEffect(() => {
         const fetchUser = async () => {
+
             try {
                 if (token) {
                     try {
@@ -73,8 +74,8 @@ function App() {
                                 navigate("/signin")
                             }
                         })
-                        .catch(() => {
-                            dispatch(logout())
+                        .catch((error) => {
+                            console.error("Profile fetch failed:", error)
                         })
                 }
             } catch (error) {

@@ -1,4 +1,4 @@
-import React, {lazy, useState} from 'react';
+import React, {lazy, useEffect, useState} from 'react';
 import {Button} from "@/components/ui/button.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {BookOpen, FileText, Plus, Trash2} from "lucide-react";
@@ -6,6 +6,8 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import Loader from "@/components/ui/Loader.jsx";
 import {Badge} from "@/components/ui/badge.jsx";
 import {useToast} from "@/hooks/use-toast.js";
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 function fetchData() {
     return fetch(`${import.meta.env.VITE_SERVER}/grade/gradeslist`)
         .then(res => res.json())
@@ -62,10 +64,17 @@ const removeChsb = async ({grade, term_number}) =>{
 }
 // const { mutate: mutateUser, isLoading: isLoadingUser, isError: isErrorUser, error: userError, isSuccess: isSuccessUser } = useMutation(postUserData);
 
-function GradeManagement(props) {
+function GradeManagement() {
     const queryClient = useQueryClient()
     const {toast} = useToast()
     const [loadingKey, setLoadingKey] = useState(null);
+    const navigate = useNavigate()
+    const user = useSelector((state) => state.user)
+    useEffect(() => {
+        if (user.role === "user") {
+            navigate("/home")
+        }
+    }, [])
     const {data, isPending:isPendingData} = useQuery({
         queryKey:['gradesList'],
         queryFn:fetchData,
@@ -169,7 +178,7 @@ function GradeManagement(props) {
                                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                             <BookOpen className="w-5 h-5 text-blue-600" />
                                         </div>
-                                        <span className="text-xl">{grade.grade}-sinf</span>
+                                        <span className="text-xl">{grade.grade==='ixtisos-sinflar' ? "Ixtisoslashgan Maktablar": `${grade.grade}-sinf`}</span>
                                     </CardTitle>
 
                                 </div>
@@ -179,7 +188,7 @@ function GradeManagement(props) {
                                     {grade.terms.map((term) => (
                                         <Card key={term._id} className="border border-gray-200">
                                             <CardHeader className="pb-3">
-                                                <CardTitle className="text-sm font-medium text-gray-700">Term {term.term_number}</CardTitle>
+                                                <CardTitle className="text-sm font-medium text-gray-700">{term.term_number}-chorak</CardTitle>
                                             </CardHeader>
                                             <CardContent className="space-y-3">
                                                 {/* BSB Section */}

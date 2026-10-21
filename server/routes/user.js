@@ -2,7 +2,7 @@ const { Router } = require("express")
 const router = Router()
 const Person = require("../models/Person")
 const bcrypt = require("bcryptjs")
-const { authMiddleware, requireRole } = require("../middleware/auth")
+const { authMiddleware, requireRole, validateMongoIdParam } = require("../middleware/auth")
 
 router.get("/get-users", authMiddleware, async (req, res) => {
   const { page, pageSize } = req.query
@@ -13,6 +13,7 @@ router.get("/get-users", authMiddleware, async (req, res) => {
     .sort({ _id: -1 })
     .skip(+skipAmount)
     .limit(+pageSize)
+    .select(' -password ')
   const totalPeople = await Person.countDocuments(filter)
   const isNext = +skipAmount + people.length < totalPeople
 
@@ -33,28 +34,51 @@ router.get("/get-users", authMiddleware, async (req, res) => {
 //     return res.status(200).json({msg:"Parol Yangilandi", allUsers})
 // })
 
-router.delete("/delete/:userId", authMiddleware, async (req, res) => {
+router.delete("/delete/:userId", authMiddleware, requireRole('bosh admin', 'admin'), validateMongoIdParam('userId'), async (req, res) => {
   const { userId } = req.params
   await Person.findByIdAndDelete(userId)
   const allUsers = await Person.find().sort({ _id: -1 })
   return res.status(200).json({ msg: "Muvaffaqiyatli o'chirildi", allUsers })
 })
 
-router.put("/profile/name/edit", authMiddleware, async (req, res) => {
-  const { newName, userId } = req.body
-  await Person.findByIdAndUpdate(userId, { name: newName })
-  const { email, role, name, _id } = await Person.findById(userId)
-  return res
-    .status(200)
-    .json({
-      msg: "Ismingiz muvaffaqiyatli o'zgartirildi",
-      user: { email, role, name, _id },
+router.put("/profile/name/edit", authMiddleware,  async (req, res) => {
+  const { newName } = req.body
+  if (typeof newName !== "string") {
+    return res.status(400).json({ error: "Ismda sonlar, belgilar va bo'sh joylar mavjud" })
+  }
+  const name = newName.trim()
+  if (name.length === 0 || name.length > 50) {
+    return res.status(400).json({
+      error: "Ism 1 dan 50 gacha belgidan iborat bo'lishi kerak",
     })
+  }
+  try {
+    const user = await Person.findByIdAndUpdate(
+      req.user._id,
+      { name },
+      { new: true, runValidators: true }
+    ).select("_id email role name")
+
+    if (!user) {
+      return res.status(404).json({ error: "Foydalanuvchi topilmadi" })
+    }
+
+    return res.json({ msg: "Ismingiz muvaffaqiyatli o'zgartirildi", user })
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" })
+  }
+  // const { email, role, name, _id } = await Person.findByIdAndUpdate(req.user._id, { name: newName }, {new : true})
+  // return res
+  //   .status(200)
+  //   .json({
+  //     msg: "Ismingiz muvaffaqiyatli o'zgartirildi",
+  //     user: { email, role, name, _id },
+  //   })
 })
 
 router.put("/profile/password/edit", authMiddleware, async (req, res) => {
-  const { currentPassword, newPassword, userId } = req.body
-  const person = await Person.findById(userId)
+  const { currentPassword, newPassword, } = req.body
+  const person = await Person.findById(req.user._id)
   const doMatch = await bcrypt.compare(currentPassword, person.password)
 
   if (doMatch) {

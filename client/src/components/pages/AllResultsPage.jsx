@@ -37,9 +37,11 @@ function AllResultsPage(props) {
         queryKey: ["test/all-results", searchParams.get("page"), AllTestResultsPageSize],
         queryFn: () => fetchAllResults(searchParams.get("page"))
     })
-    if (user.role === "user" || user.role === "admin") {
-        navigate("/home")
-    }
+    useEffect(() => {
+        if (user.role === "user" || user.role === "admin") {
+            navigate("/home")
+        }
+    }, [])
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60)
         const remainingSeconds = seconds % 60

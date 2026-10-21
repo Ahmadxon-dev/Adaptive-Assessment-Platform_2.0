@@ -7,7 +7,7 @@ const upload = require("../middleware/upload")
 const cloudinary = require("cloudinary").v2
 const { v4: uuidv4 } = require("uuid")
 const Person = require("../models/Person")
-const { authMiddleware } = require("../middleware/auth")
+const { authMiddleware, requireRole } = require("../middleware/auth")
 //start
 
 router.get("/getfulltestdb-by-id", authMiddleware, async (req, res) => {
@@ -35,7 +35,7 @@ router.post("/start/abituriyent", authMiddleware, async (req, res) => {
     req.body
 
   // Find the topic that contains the given subtopics
-  const topic = await TopicAndQuestion.find({
+  const topic = await TopicAndQuestion.findOne({
     gradeLevel: "abituriyent",
     questionType: "multiple-choice",
     "subtopics.subtopicname": { $in: subtopicnamesArray },
@@ -116,9 +116,7 @@ router.post("/start", authMiddleware, async (req, res) => {
     questionType,
   } = req.body
   const { b, q, m } = numberOfQuestions
-
   const gradeLevel = testType === "attestatsiya" ? "attestatsiya" : grade
-
   // Step 1: Fetch all topics containing the selected subtopics
   const topics = await TopicAndQuestion.find({
     gradeLevel,
@@ -243,7 +241,6 @@ router.post("/start", authMiddleware, async (req, res) => {
     testType,
     term,
   })
-
   await newTest.save()
   return res.status(200).json({ msg: "Test yaratildi", testId: newTest._id, newTest })
 })
@@ -292,12 +289,38 @@ router.get("/:testId", authMiddleware, async (req, res) => {
 // });
 
 // test submit after all from cache
+const normalizeAnswer = (answer) => {
+  return String(answer ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+};
 
+const isAnswerCorrect = (selectedAnswer, correctAnswer) => {
+  const userAnswer = normalizeAnswer(selectedAnswer);
+  const expectedAnswer = normalizeAnswer(correctAnswer);
+
+  if (!userAnswer || !expectedAnswer) return false;
+
+  // Exact text comparison
+  if (userAnswer === expectedAnswer) return true;
+
+  // Compare purely numerical answers
+  const numericPattern = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
+
+  if (
+    numericPattern.test(userAnswer) &&
+    numericPattern.test(expectedAnswer)
+  ) {
+    return Number(userAnswer) === Number(expectedAnswer);
+  }
+
+  return false;
+};
 router.put("/submit/:testId", authMiddleware, async (req, res) => {
   const { testId } = req.params
   const { remainingTime, isCompleted, answers } = req.body
   // answers = [{questionIndex: 0, selectedAnswer: "option2"}, ...]
-
   try {
     const test = await Test.findById(testId)
     if (!test) return res.status(404).json({ error: "Test not found" })
@@ -318,17 +341,24 @@ router.put("/submit/:testId", authMiddleware, async (req, res) => {
     // Calculate score
     let score = 0
     test.questions.forEach((q) => {
-      if (q.selectedAnswer && q.selectedAnswer === q.correctAnswer) {
+      if (q.selectedAnswer && isAnswerCorrect(q.selectedAnswer, q.correctAnswer)) {
         score++
       }
     })
+
+    // Calculate score
+    // let score = 0
+    // test.questions.forEach((q) => {
+    //   if (q.selectedAnswer && q.selectedAnswer === q.correctAnswer) {
+    //     score++
+    //   }
+    // })
 
     test.result = score
 
     await test.save()
     return res.status(200).json({ msg: "Test submitted successfully", score })
   } catch (e) {
-    console.error(e)
     return res.status(500).json({ error: "Server error" })
   }
 })
@@ -366,7 +396,7 @@ router.get("/results/:userEmail", authMiddleware, async (req, res) => {
 })
 
 // crud topics, questions
-router.post("/topics/add", authMiddleware, async (req, res) => {
+router.post("/topics/add", authMiddleware, requireRole("bosh admin", 'admin'), async (req, res) => {
   const { newMainTopic, gradeLevel, questionType } = req.body
   const newTopic = new TopicAndQuestion({
     gradeLevel,
@@ -378,13 +408,13 @@ router.post("/topics/add", authMiddleware, async (req, res) => {
   const newData = await getGradeTopics(gradeLevel, questionType)
   return res.status(200).json({ msg: "Yangi bo'lim muvaffaqiyatli yaratildi", newData })
 })
-router.delete("/topics/delete", authMiddleware, async (req, res) => {
+router.delete("/topics/delete", authMiddleware, requireRole("bosh admin", 'admin'), async (req, res) => {
   const { mainTopicId, gradeLevel, questionType } = req.body
   await TopicAndQuestion.findByIdAndDelete(mainTopicId)
   const newData = await getGradeTopics(gradeLevel, questionType)
   return res.status(200).json({ msg: "Bo'lim muvaffaqiyatli o'chirildi", newData })
 })
-router.put("/topics/edit", authMiddleware, async (req, res) => {
+router.put("/topics/edit", authMiddleware, requireRole("bosh admin", 'admin'),  async (req, res) => {
   const { mainTopicId, newMainTopicName, gradeLevel, questionType } = req.body
   await TopicAndQuestion.findByIdAndUpdate(mainTopicId, {
     maintopicname: newMainTopicName,
@@ -393,7 +423,7 @@ router.put("/topics/edit", authMiddleware, async (req, res) => {
   return res.status(200).json({ msg: "Bo'lim muvaffaqiyatli o'zgartirildi", newData })
 })
 
-router.post("/subtopics/add", authMiddleware, async (req, res) => {
+router.post("/subtopics/add", authMiddleware, requireRole("bosh admin", 'admin'),  async (req, res) => {
   const { newSubTopic, mainTopicId, gradeLevel, questionType } = req.body
   await TopicAndQuestion.findByIdAndUpdate(
     mainTopicId,
@@ -410,7 +440,7 @@ router.post("/subtopics/add", authMiddleware, async (req, res) => {
   const newData = await getGradeTopics(gradeLevel, questionType)
   return res.status(200).json({ msg: "Yangi mavzu muvaffaqiyatli yaratildi", newData })
 })
-router.delete("/subtopics/delete", authMiddleware, async (req, res) => {
+router.delete("/subtopics/delete", authMiddleware, requireRole("bosh admin", 'admin'),  async (req, res) => {
   const { subTopicName, mainTopicId, gradeLevel, questionType } = req.body
   await TopicAndQuestion.findByIdAndUpdate(
     mainTopicId,
@@ -425,7 +455,7 @@ router.delete("/subtopics/delete", authMiddleware, async (req, res) => {
   return res.status(200).json({ msg: "Mavzu muvaffaqiyatli o'chirildi", newData })
 })
 
-router.put("/subtopics/edit", authMiddleware, async (req, res) => {
+router.put("/subtopics/edit", authMiddleware, requireRole("bosh admin", 'admin'),  async (req, res) => {
   const { mainTopicId, newSubTopicName, oldSubTopicName, gradeLevel, questionType } =
     req.body
   await TopicAndQuestion.findOneAndUpdate(
@@ -441,7 +471,7 @@ router.put("/subtopics/edit", authMiddleware, async (req, res) => {
 })
 
 // add questiontype
-router.delete("/questions/delete", authMiddleware, async (req, res) => {
+router.delete("/questions/delete", authMiddleware, requireRole("bosh admin", 'admin'),  async (req, res) => {
   const { mainTopicId, subTopicName, questionId, gradeLevel, questionType } = req.body
   await TopicAndQuestion.findOneAndUpdate(
     { _id: mainTopicId, "subtopics.subtopicname": subTopicName },
@@ -480,7 +510,7 @@ const uploadToCloudinary = (buffer, publicId) => {
       .end(buffer)
   })
 }
-router.post("/questions/add", authMiddleware, upload, async (req, res) => {
+router.post("/questions/add", authMiddleware, upload, requireRole("bosh admin", 'admin'),  async (req, res) => {
   try {
     const {
       gradeLevel,
@@ -584,7 +614,7 @@ router.post("/questions/add", authMiddleware, upload, async (req, res) => {
   }
 })
 
-router.patch("/questions/edit", authMiddleware, upload, async (req, res) => {
+router.patch("/questions/edit", authMiddleware, upload, requireRole("bosh admin", 'admin'),  async (req, res) => {
   try {
     const {
       gradeLevel,
@@ -716,7 +746,7 @@ router.patch("/questions/edit", authMiddleware, upload, async (req, res) => {
   }
 })
 
-router.put("/questions/edit/status", authMiddleware, async (req, res) => {
+router.put("/questions/edit/status", authMiddleware, requireRole("bosh admin", 'admin'), async (req, res) => {
   const { topicId, subtopicName, questionId, newStatus, gradeLevel, questionType } =
     req.body
   try {
@@ -759,7 +789,7 @@ router.put("/questions/edit/status", authMiddleware, async (req, res) => {
   }
 })
 
-router.post("/open-ended/questions/add", authMiddleware, upload, async (req, res) => {
+router.post("/open-ended/questions/add", authMiddleware, upload, requireRole("bosh admin", 'admin'),  async (req, res) => {
   try {
     const {
       gradeLevel,
@@ -805,7 +835,7 @@ router.post("/open-ended/questions/add", authMiddleware, upload, async (req, res
     res.status(500).json({ error: "Error adding question", err })
   }
 })
-router.patch("/open-ended/questions/edit", authMiddleware, upload, async (req, res) => {
+router.patch("/open-ended/questions/edit", authMiddleware, upload, requireRole("bosh admin", 'admin'),  async (req, res) => {
   try {
     const {
       gradeLevel,
