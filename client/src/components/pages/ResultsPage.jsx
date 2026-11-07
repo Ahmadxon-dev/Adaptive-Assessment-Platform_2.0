@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Link, useSearchParams } from "react-router-dom"
+import { data, Link, useSearchParams } from "react-router-dom"
 import { Loader2, Eye, ChevronLeft, ChevronRight, Clock, Mail, Download } from "lucide-react"
 import { Button } from "@/components/ui/button.jsx"
 import { useQuery } from "@tanstack/react-query"
@@ -76,6 +76,7 @@ function ResultsPage(props) {
     if (isPending) {
         return <Loader />
     }
+    
     return (
         <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-10xl mx-auto">
@@ -115,8 +116,10 @@ function ResultsPage(props) {
                                                         key={item._id}
                                                         className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                                     >
-                                                        <TableCell className="font-medium">
+                                                        <TableCell className="font-medium max-w-40 hover:cursor-pointer"   title={item.subtopicname.join(", ")}> 
+                                                            <div className="truncate">
                                                             {item.subtopicname.join(", ")}
+                                                            </div>
                                                         </TableCell>
                                                         <TableCell>{item.questions.length}</TableCell>
                                                         <TableCell>{item.result}</TableCell>
@@ -131,9 +134,9 @@ function ResultsPage(props) {
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell>
-                                                            {(item.grade != null && item.grade != 'ixtisos-sinflar' ) &&
+                                                            {(item.grade != null && !item.grade.includes('ixtisos-') ) &&
                                                                 `${item.grade}-sinf, ${item.term}-chorak, ${item.testType}`}
-                                                            { item.grade === 'ixtisos-sinflar' && `Ixtisos sinf, ${item.term}-chorak, ${item.testType}` }
+                                                            { item.grade?.includes('ixtisos-') && `Ixtisoslashgan ${item.grade.slice(8)}-sinf, ${item.term}-chorak, ${item.testType}` }
                                                             {item.testType === "attestatsiya" &&
                                                                 item.testType.toUpperCase()}
                                                             {item.testType === "abituriyent" &&

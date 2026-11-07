@@ -1,4 +1,4 @@
-import React, {lazy, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {Button} from "@/components/ui/button.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {BookOpen, FileText, Plus, Trash2} from "lucide-react";
@@ -178,7 +178,7 @@ function GradeManagement() {
                                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                             <BookOpen className="w-5 h-5 text-blue-600" />
                                         </div>
-                                        <span className="text-xl">{grade.grade==='ixtisos-sinflar' ? "Ixtisoslashgan Maktablar": `${grade.grade}-sinf`}</span>
+                                        <span className="text-xl">{grade.grade.includes("ixtisos") ? `Ixtisoslashgan Maktab, ${grade.grade.slice(8)}-sinf` : `${grade.grade}-sinf`}</span>
                                     </CardTitle>
 
                                 </div>

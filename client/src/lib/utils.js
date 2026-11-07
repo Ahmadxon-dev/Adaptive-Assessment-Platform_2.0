@@ -41,3 +41,8 @@ export const isAnswerCorrect = (question, questionType) => {
 
   return false;
 };
+
+export const checkGrade = (grade, classType) => {
+  if (classType === 'standard')return grade
+  if(classType === 'ixtisos-sinflar')return `ixtisos-${grade}`
+}

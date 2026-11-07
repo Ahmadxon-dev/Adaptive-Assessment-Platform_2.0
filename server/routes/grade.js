@@ -41,6 +41,7 @@ router.post("/addbsb", authMiddleware, async (req, res) => {
     )
     return res.status(200).json({ msg: "Bsb muvaffaqiyatli qo'shildi" })
   } catch (e) {
+    console.log(e)
     return res.status(500).json({ error: "Internal Server Error" })
   }
 })
@@ -66,6 +67,7 @@ router.post("/addchsb", authMiddleware, async (req, res) => {
     )
     return res.status(200).json({ msg: "Chsb muvaffaqiyatli qo'shildi" })
   } catch (e) {
+    console.log(e)
     return res.status(500).json({ error: "Internal Server Error" })
   }
 })
@@ -75,6 +77,7 @@ router.get("/gradeslist", async (req, res) => {
     const gradesList = await Grade.find()
     return res.status(200).json(gradesList)
   } catch (e) {
+    console.log(e)
     return res.status(500).json({ error: "Internal server error" })
   }
 })
@@ -101,6 +104,7 @@ router.delete("/deletechsb", authMiddleware, async (req, res) => {
 
     return res.status(200).json({ msg: "Chsb muvaffaqiyatli o'chirildi" })
   } catch (e) {
+    console.log(e)
     return res.status(500).json({ error: "Internal server error" })
   }
 })

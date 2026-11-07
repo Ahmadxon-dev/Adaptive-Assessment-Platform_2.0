@@ -68,7 +68,6 @@ function AllResultsPage(props) {
                 term: result.term,
                 timeSpent: formatTime(result.remainingTime)
             }))
-
             setData(transformedData.filter((item) => item.role !== "bosh admin"))
         }
     }, [allResultsData])
@@ -258,7 +257,14 @@ function AllResultsPage(props) {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                {result.grade}-sinf, {result.term}-chorak, {result.testType}
+                                            {(result.grade != null && !result.grade.includes('ixtisos-') ) &&
+                                                                `${result.grade}-sinf, ${result.term}-chorak, ${result.testType}`}
+                                                            { result.grade?.includes('ixtisos-') && `Ixtisoslashgan ${result.grade.slice(8)}sinf, ${result.term}-chorak, ${result.testType}` }
+                                                            {result.testType === "attestatsiya" &&
+                                                                result.testType.toUpperCase()}
+                                                            {result.testType === "abituriyent" &&
+                                                                result.testType.toUpperCase()}
+                                             
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">

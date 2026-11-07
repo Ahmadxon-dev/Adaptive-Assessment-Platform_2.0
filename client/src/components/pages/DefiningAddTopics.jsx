@@ -6,7 +6,7 @@ import {Link, useNavigate} from "react-router-dom";
 function DefiningAddTopics() {
     const user = useSelector((state) => state.user)
     const navigate = useNavigate()
-    const allGrades = [7, 8, 9, 10, 11, 'Abituriyent', 'Attestatsiya', 'Ixtisos Sinflar']
+    const allGrades = [7, 8, 9, 10, 11, 'Abituriyent', 'Attestatsiya', 'Ixtisoslashgan Maktab']
     const grades = allGrades.slice(0, 5)
     const others = allGrades.slice(5)
 
@@ -23,7 +23,7 @@ function DefiningAddTopics() {
                     {
                         grades.map(element => {
                             return <Button asChild key={element} className={`px-8 py-3 pb-4 text-2xl`}>
-                                <Link to={`${element}`}>
+                                <Link to={`standard/${element}`}>
                                     {element}-sinf
                                 </Link>
                             </Button>
@@ -33,8 +33,8 @@ function DefiningAddTopics() {
                 <div className="flex justify-evenly pt-10">
                     {
                         others.map(element => {
-                            return <Button key={element} asChild={true} className=" px-8 py-3 pb-4 text-2xl">
-                                <Link to={element === 'Ixtisos Sinflar'? 'ixtisos-sinflar': element.toLowerCase()} >
+                            return <Button key={element} asChild={true} className="px-8 py-3 pb-4 text-2xl">
+                                <Link to={element === 'Ixtisoslashgan Maktab'? 'ixtisos-sinflar/': `standard/${element.toLowerCase()}`} >
                                     {element}
                                 </Link>
                             </Button>

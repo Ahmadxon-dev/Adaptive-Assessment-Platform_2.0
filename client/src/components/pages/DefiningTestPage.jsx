@@ -29,7 +29,7 @@ function DefiningTestPage() {
     const [topicsData, setTopicsData] = useState([])
     const [numQuestions, setNumQuestions] = useState({ b: 0, q: 0, m: 0 })
     const { toast } = useToast()
-    const { test, grade, term } = useParams()
+    const {type, grade, term, test }= useParams()
     const [questionType, setQuestionType] = useState(test === "chsb" ? "multiple-choice" : "open-ended")
     const dispatch = useDispatch()
     const user = useSelector((state) => state.user)
@@ -50,6 +50,12 @@ function DefiningTestPage() {
             setTopicsData(data)
         }
     }, [data])
+    useEffect( () =>{
+        if(grade === 'ixtisos-sinflar')
+        {
+            navigate('/gradelist/ixtisos-sinflar/')
+        }
+    }, [])
     const handleInputChange = (e, unit) => {
         let value = e.target.value
         value = value.replace(/^0+/, "")
@@ -128,7 +134,7 @@ function DefiningTestPage() {
                 <Card className="bg-white max-w-6xl mx-auto shadow-lg rounded-lg overflow-hidden">
                     <div className={` mx-auto mt-8 p-6 bg-white rounded-lg shadow-md`}>
                         <h1 className={`text-2xl font-bold text-center text-gray-800`}>
-                            {grade==='ixtisos-sinflar'?'Ixtisos Sinflar,':`${grade}-sinf,`}  {term}-chorak, {test}
+                            {type==='ixtisos-sinflar'? `Ixtisoslashgan ${grade.slice(8)}-sinf,`:`${grade}-sinf,`}  {term}-chorak, {test}
                         </h1>
                         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
                             {questionType === "multiple-choice" ? `Yopiq test` : "Ochiq test"} yechish uchun bo'lim,
@@ -138,9 +144,9 @@ function DefiningTestPage() {
                             <div className="mb-3 p-2 bg-muted rounded-md">
                                 <p className="font-medium mb-1">Tanlangan mavzular:</p>
                                 <div className="flex flex-wrap gap-1">
-                                    {selectedSubTopicNames.map((topic) => (
+                                    {selectedSubTopicNames.map((topic, idx) => (
                                         <span
-                                            key={topic}
+                                            key={topic+idx}
                                             className="bg-primary/10 text-primary px-2 py-1 rounded text-sm"
                                         >
                                             {topic}

@@ -7,7 +7,6 @@ import TestPage from "@/components/pages/TestPage.jsx"
 import Loader from "@/components/ui/Loader.jsx"
 import { jwtDecode } from "jwt-decode"
 
-const AddTopicsPage = lazy(() => import("./components/pages/AddTopicsPage.jsx"))
 const NotFoundPage = lazy(() => import("./components/pages/NotFoundPage.jsx"))
 const AllResultsPage = lazy(() => import("./components/pages/AllResultsPage.jsx"))
 const SettingsPage = lazy(() => import("./components/pages/SettingsPage.jsx"))
@@ -29,6 +28,8 @@ const DefiningAddTopics = lazy(() => import("./components/pages/DefiningAddTopic
 const EachGradeAddTopic = lazy(() => import("./components/pages/EachGradeAddTopic.jsx"))
 const QuestionTypePage = lazy(() => import("./components/pages/QuestionTypePage.jsx"))
 const LandingPage = lazy(() => import("./components/pages/LandingPage.jsx"))
+const GradesListIxtisos = lazy(() => import('./components/pages/GradesListIxtisos.jsx'))
+const DefiningAddTopicsIxtisos = lazy(() => import('./components/pages/DefiningAddTopicsIxtisos.jsx'))
 
 function AppLayout() {
     return (
@@ -68,11 +69,11 @@ function App() {
                     })
                         .then((res) => res.json())
                         .then((data) => {
-                            dispatch(setUser(data.user))
                             if (data.error) {
                                 dispatch(logout())
                                 navigate("/signin")
                             }
+                            dispatch(setUser(data.user))
                         })
                         .catch((error) => {
                             console.error("Profile fetch failed:", error)
@@ -105,10 +106,11 @@ function App() {
             <Route element={<AppLayout />}>
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/gradelist" element={<GradesList />} />
-                <Route path="/gradelist/:grade" element={<DefineGrade />} />
+                <Route path="/gradelist/:type/:grade" element={<DefineGrade />} />
                 <Route path="/gradelist/abituriyent" element={<AbituriyentPage />} />
                 <Route path="/gradelist/attestatsiya" element={<AttestatsiyaPage />} />
-                <Route path="/gradelist/:grade/:term/:test" element={<DefiningTestPage />} />
+                <Route path="/gradelist/ixtisos-sinflar" element={<GradesListIxtisos />} />
+                <Route path="/gradelist/:type/:grade/:term/:test" element={<DefiningTestPage />} />
                 <Route path="/grademanagement" element={<GradeManagement />} />
                 <Route path="/test/:testId" element={<TestPage />} />
                 <Route path="/signup" element={<SignupForm />} />
@@ -117,10 +119,12 @@ function App() {
                 <Route path="/results/:testId" element={<EachResultPage />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/testtopdf" element={<TestToPdf />} />
-                <Route path="/addtopic" element={<AddTopicsPage />} />
                 <Route path="/defining-grades" element={<DefiningAddTopics />} />
-                <Route path="/defining-grades/:grade" element={<QuestionTypePage />} />
-                <Route path="/defining-grades/:grade/:questionType" element={<EachGradeAddTopic />} />
+                <Route path="/defining-grades/:classType/:grade" element={<QuestionTypePage />} />
+                <Route path="/defining-grades/attestatsiya" element={<QuestionTypePage />} />
+                <Route path="/defining-grades/abituriyent" element={<QuestionTypePage />} />
+                <Route path="/defining-grades/ixtisos-sinflar" element={<DefiningAddTopicsIxtisos />} />
+                <Route path="/defining-grades/:classType/:grade/:questionType" element={<EachGradeAddTopic />} />
                 <Route path="/profile/settings" element={<SettingsPage />} />
                 <Route path="/allresults" element={<AllResultsPage />} />
                 <Route path="/guide" element={<GuidePage />} />

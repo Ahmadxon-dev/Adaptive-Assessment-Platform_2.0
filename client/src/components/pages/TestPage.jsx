@@ -186,7 +186,7 @@ function TestPage() {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <CardTitle className="text-md  font-bold text-center my-2 md:my-0">
                             Mavzular: {test?.subtopicname?.map((subtopic, index) => (
-                                <span key={subtopic}>
+                                <span key={subtopic+index}>
                                     {subtopic}{index !== (test?.subtopicname?.length || 0) - 1 ? ', ' : ''}
                                 </span>
                             ))}
@@ -261,7 +261,7 @@ function TestPage() {
 
                                     {test?.questions?.length > 0
                                         ? Object.values(test?.questions?.[currentIndex]?.options || {}).map((option, index) => (
-                                            <div key={option.text} className="flex items-center space-x-4">
+                                            <div key={option.text+index} className="flex items-center space-x-4">
                                                 <RadioGroupItem value={"option" + Number(index + 1)} id={`option-${index}`}/>
                                                 <Label htmlFor={`option-${index}`}
                                                        className="text-xl flex justify-between items-center">

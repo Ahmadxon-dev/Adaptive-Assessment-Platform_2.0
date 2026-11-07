@@ -29,13 +29,21 @@ function EachGradeAddTopic() {
             navigate("/home")
         }
     }, [])
-    const {grade, questionType} = useParams()
-    const {data, isPending} = useQuery({queryFn:()=>fetchData(grade, questionType), queryKey:["test/getfulltestdb-by-id", grade, questionType]})
+    const {classType, grade, questionType} = useParams()
+    const {data, isPending} = useQuery({queryFn:()=>{
+        if(classType === 'ixtisos-sinflar'){
+            return fetchData(`ixtisos-${grade}`, questionType)
+        }
+        if(classType === 'standard'){
+            return fetchData(grade, questionType)
+        }
+    }, queryKey:["test/getfulltestdb-by-id", grade, questionType, classType]})
+
     if (isPending){
         return <Loader />
     }
     return (
-        <AddTopicsPage data={data} grade={grade} questionType={questionType===undefined?"multiple-choice":questionType} />
+        <AddTopicsPage data={data} classType={classType} grade={grade} questionType={questionType===undefined?"multiple-choice":questionType} />
     );
 }
 

@@ -13,10 +13,10 @@ const PaginationComponent = ({ isNext, pageNumber }) => {
 
     if (!isNext && +pageNumber === 1) return null
     return (
-        <Pagination className={"my-5"}>
+        <Pagination className={"my-5 "}>
             <PaginationContent>
                 <PaginationItem>
-                    <Button size="sm" onClick={() => onNavigation("prev")} disabled={searchParams.get("page") === "1"}>
+                    <Button size="sm" className={'bg-gray-600'} onClick={() => onNavigation("prev")} disabled={searchParams.get("page") === "1"}>
                         Oldingisi
                     </Button>
                 </PaginationItem>
@@ -26,7 +26,7 @@ const PaginationComponent = ({ isNext, pageNumber }) => {
                     </PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
-                    <Button size="sm" onClick={() => onNavigation("next")} disabled={!isNext}>
+                    <Button size="sm" className={'bg-gray-600'} onClick={() => onNavigation("next")} disabled={!isNext}>
                         Keyingisi
                     </Button>
                 </PaginationItem>

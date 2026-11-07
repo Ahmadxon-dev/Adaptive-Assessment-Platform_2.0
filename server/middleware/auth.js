@@ -7,7 +7,9 @@ function authMiddleware(req, res, next) {
   if (!token) return res.status(401).json({ error: "No token provided" })
 
   jwt.verify(token, SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ error: "Invalid or expired token" })
+    if (err) {
+      return res.status(401).json({ error: "Invalid or expired token" })
+    }
     req.user = decoded // attach decoded payload (userId, role, etc.)
     next()
   })
@@ -24,17 +26,16 @@ function requireRole(...allowedRoles) {
 }
 function validateMongoIdParam(paramName) {
   return (req, res, next) => {
-    const id = req.params[paramName];
+    const id = req.params[paramName]
 
     if (!/^[0-9a-fA-F]{24}$/.test(id)) {
       return res.status(400).json({
-        error: "Invalid ID"
-      });
+        error: "Invalid ID",
+      })
     }
 
-    next();
-  };
-
+    next()
+  }
 }
 function requireSelfOrRole(...allowedRoles) {
   return (req, res, next) => {
